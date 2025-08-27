@@ -40,7 +40,12 @@
     - [4.1.1. HTTP Request/Response](#411-http-requestresponse)
   - [4.2. HTTPS (HTTP Secure)](#42-https-http-secure)
     - [4.2.1 How HTTPS Works](#421-how-https-works)
-    - [4.2.2. Example (as a backend dev)](#422-example-as-a-backend-dev)
+    - [4.2.2. **TLS/SSL Basics**](#422-tlsssl-basics)
+      - [4.2.2.1. **What TLS/SSL Does**](#4221-what-tlsssl-does)
+      - [4.2.2.2. **How TLS/SSL Works (Simplified)**](#4222-how-tlsssl-works-simplified)
+      - [4.2.2.3. Why TLS/SSL is Critical for Backend Dev](#4223-why-tlsssl-is-critical-for-backend-dev)
+      - [4.2.2.4. Summary](#4224-summary)
+    - [4.2.3. Example (as a backend dev)](#423-example-as-a-backend-dev)
   - [4.3 Key HTTP/HTTPS Concepts (Summary)](#43-key-httphttps-concepts-summary)
 - [5.](#5)
 
@@ -339,7 +344,7 @@ As a backend developer, you almost never touch this directly, but it matters whe
 
 **EXAMPLE:** How a client calls your api
 
-- Application Layer: Browser sends `GET /users request(HTTP).
+- Application Layer: Browser sends `GET /users request(HTTP)`.
 - Transport Layer: Wrapped in TCP segment, reliable connection established.
 - Network Layer: Packet gets destination IP (server's public IP)
 - Link/Physical Layer: Transmitted over Ethernet/Wi-Fi until it reaches server.
@@ -571,7 +576,66 @@ A response has:
    - Browser checks if it’s valid.
    - If valid → secure lock in browser.
 
-### 4.2.2. Example (as a backend dev)
+4. **Key Exchange**:
+
+- The client generates a random session key (used for faster symmetric encryption).
+- This key is encrypted with the server’s public key (asymmetric encryption) and sent to the server.
+- Only the server can decrypt it using its private key.
+
+5. **Data Transmission**:
+
+- Now both sides have the same session key.
+- They switch to symmetric encryption (AES, ChaCha20, etc.) because it’s much faster for actual data transfer.
+
+<img src="images/maxresdefault.jpg">
+
+### 4.2.2. **TLS/SSL Basics**
+
+- **SSL (Secure Sockets Layer):** The original protocol for encrypting internet traffic (obsolete but still commonly used).
+- **TLS (Transport Layer Security):** The modern, secure successor to SSL (what’s actually used today).
+
+When people say “SSL certificate,” they usually mean **TLS certificate**.
+
+#### 4.2.2.1. **What TLS/SSL Does**
+
+1. **Encryption** – Scrambles data so only the intended recipient can read it.
+
+   - Prevents attackers from sniffing sensitive info (e.g., passwords, credit card numbers).
+
+2. **Authentication** – Uses digital certificates to prove the server is who it claims to be.
+
+   - Example: When you connect to `https://google.com`, TLS ensures you’re really talking to Google, not an attacker.
+
+3. **Integrity** – Ensures data isn’t modified in transit.
+
+   - If a hacker tries to tamper with packets, TLS detects it.
+
+#### 4.2.2.2. **How TLS/SSL Works (Simplified)**
+
+1. **Client Hello** – Browser says: “I want to connect securely. Here are encryption methods I support.”
+2. **Server Hello** – Server replies with its certificate (proves its identity) + picks an encryption method.
+3. **Key Exchange** – Client and server agree on a **session key** (used to encrypt the session).
+4. **Secure Communication** – All further HTTP messages are encrypted with the session key.
+
+#### 4.2.2.3. Why TLS/SSL is Critical for Backend Dev
+
+- All modern APIs and web apps **must** use HTTPS (with TLS).
+- Required for compliance (GDPR, PCI-DSS, etc.).
+- Browsers mark HTTP-only sites as **“Not Secure”**.
+
+#### 4.2.2.4. Summary
+
+- Definition: Encryption protocols used to secure communication over the Internet.
+- Purpose: By encrypting data transmitted between a client (computer/browser) and a server, they prevent third parties from eavesdropping or tampering with the data.
+- Key Benefits:
+
+  - Confidentiality – keeps data private.
+  - Integrity – prevents modification during transmission.
+  - Authentication – ensures the server (and sometimes the client) is the real one.
+
+- Together, they provide **encryption + authentication + integrity** for HTTPS.
+
+### 4.2.3. Example (as a backend dev)
 
 - You build a REST API:
 
