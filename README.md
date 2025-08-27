@@ -7,6 +7,7 @@
 - [Basic web concepts](#basic-web-concepts)
 - [Note for learning basic networking](#note-for-learning-basic-networking)
 - [Table of contents](#table-of-contents)
+- [0. Introduction flow:](#0-introduction-flow)
 - [1. DNS (Domain Name System)](#1-dns-domain-name-system)
   - [1.1. What is DNS?](#11-what-is-dns)
   - [1.2. The 4 DNS Servers in web loading](#12-the-4-dns-servers-in-web-loading)
@@ -34,6 +35,79 @@
     - [3.5.2. Subnet Mask](#352-subnet-mask)
   - [3.6. Key Formulas and Backend Dev Relevance](#36-key-formulas-and-backend-dev-relevance)
   - [3.7. Summary and example](#37-summary-and-example)
+- [4. HTTP/HTTPS:](#4-httphttps)
+  - [4.1. HTTP (HyperText Transfer Protocol)](#41-http-hypertext-transfer-protocol)
+    - [4.1.1. HTTP Request/Response](#411-http-requestresponse)
+  - [4.2. HTTPS (HTTP Secure)](#42-https-http-secure)
+    - [4.2.1 How HTTPS Works](#421-how-https-works)
+    - [4.2.2. Example (as a backend dev)](#422-example-as-a-backend-dev)
+  - [4.3 Key HTTP/HTTPS Concepts (Summary)](#43-key-httphttps-concepts-summary)
+- [5.](#5)
+
+# 0. Introduction flow:
+
+```pgsql
+You type:  example.com
+           |
+           v
++------------------+
+|   DNS Lookup     |   🔎 "What is the IP of example.com?"
++------------------+
+           |
+           v
++------------------+
+|   TCP/IP Layer   |   📦 Use the IP to establish a connection (TCP handshake)
++------------------+
+           |
+           v
++------------------+
+|   HTTP/HTTPS     |   🌐 Send/receive web data over the TCP connection
++------------------+
+```
+
+---
+
+```pgsql
+[ You / Browser ]
+        |
+        | 1. Type "http://example.com"
+        v
++-------------------+
+|   DNS Resolver    |  <-- asks "What is example.com?"
++-------------------+
+        |
+        | 2. DNS Query (UDP/TCP 53)
+        v
++-------------------+       +---------------------+
+| Root DNS Server   | --->  | .com DNS Server     |
++-------------------+       +---------------------+
+                                   |
+                                   v
+                           +---------------------+
+                           | example.com DNS     |
+                           | -> 93.184.216.34    |
+                           +---------------------+
+
+        |
+        | 3. DNS Response: IP = 93.184.216.34
+        v
+[ You / Browser ]
+        |
+        | 4. Open TCP connection (port 80/443)
+        v
++--------------------------------------------------+
+|   Web Server at 93.184.216.34                    |
+|                                                  |
+|   <--- HTTP Request: GET / HTTP/1.1 ------------ |
+|   ---> HTTP Response: 200 OK + HTML ------------ |
++--------------------------------------------------+
+```
+
+Breakdown:
+
+- DNS: resolves name -> IP.
+- TCP/IP: makes sure two machines can talk reliably using that IP.
+- HTTP/HTTPs: the actual web protocol to exchange requests & responses.
 
 # 1. DNS (Domain Name System)
 
@@ -387,6 +461,7 @@ An IP address has two parts:
 
 Example:
 `192.168.1.10/24`
+
 - Network part = `192.168.1`
 - Host part = `10`
 - `/24` = **Subnet Mask length** (24 bits for network, 8 bits for hosts).
@@ -418,7 +493,7 @@ Example:
 **Key Formulas:**
 
 - Number of hosts per subnet = 2^(host bits) – 2
-(subtract 2 for network address & broadcast address).
+  (subtract 2 for network address & broadcast address).
 
 - Number of subnets = 2^(borrowed bits).
 
@@ -429,7 +504,7 @@ Example:
 - Scaling apps: Must understand subnetting + routing when setting up clusters.
 - Security: Configure firewalls to allow/deny specific IP ranges.
 
-## 3.7. Summary and example 
+## 3.7. Summary and example
 
 Example of Subnetting
 
@@ -437,5 +512,105 @@ Suppose you have:
 `192.168.1.0/24` (256 IP addresses: 0–255).
 
 Split into 2 subnets (/25):
+
 - `192.168.1.0/25` → Hosts: 0–127 (126 usable).
 - `192.168.1.128/25` → Hosts: 128–255 (126 usable).
+
+# 4. HTTP/HTTPS:
+
+## 4.1. HTTP (HyperText Transfer Protocol)
+
+- **Definition**: A communication protocol for transferring data (HTML, JSON, files, etc.) between **client (browser, app)** and **server**.
+- **Stateless**: Each request is independent; server doesn’t “remember” previous requests (unless we use sessions, cookies, or tokens).
+- **Layer**: Works on **Application Layer** (OSI model) and usually runs on **TCP (port 80)**.
+
+### 4.1.1. HTTP Request/Response
+
+A request has:
+
+- **Method** (what the client wants to do):
+
+  - `GET` – retrieve data
+  - `POST` – send data (like form submission)
+  - `PUT` – update/replace data
+  - `PATCH` – partially update data
+  - `DELETE` – remove data
+  - `HEAD` – like GET but only headers (no body)
+  - `OPTIONS` – ask the server which methods are supported
+
+- **Headers** → Metadata (e.g., Content-Type, Authorization).
+- **Body** → Data (for POST/PUT, e.g., JSON).
+
+A response has:
+
+- **Status code**:
+
+  - `200 OK` → success.
+  - `404 Not Found`.
+  - `500 Internal Server Error`.
+
+- **Headers** → Metadata (e.g., Content-Length).
+- **Body** → HTML, JSON, or file.
+
+## 4.2. HTTPS (HTTP Secure)
+
+- **Definition**: HTTP + **TLS/SSL encryption** → Secure communication.
+- **Port**: Runs on **TCP 443**.
+- **Why?**
+
+  - Encrypts data (prevents sniffing).
+  - Authentication (server identity verified by SSL certificate).
+  - Integrity (detects tampering).
+
+### 4.2.1 How HTTPS Works
+
+1. **Handshake**: Client and server exchange keys using TLS.
+2. **Encryption**: Communication is encrypted with symmetric keys.
+3. **Certificates**: Server presents a digital certificate (issued by Certificate Authority).
+
+   - Browser checks if it’s valid.
+   - If valid → secure lock in browser.
+
+### 4.2.2. Example (as a backend dev)
+
+- You build a REST API:
+
+  - **Without HTTPS** → Requests are plain text. A hacker on the same Wi-Fi can see:
+
+    ```https
+    GET /login?username=admin&password=1234
+    ```
+
+  - **With HTTPS** → All requests & responses are encrypted; attacker sees gibberish.
+
+## 4.3 Key HTTP/HTTPS Concepts (Summary)
+
+**Summary**
+
+- HTTP (HyperText Transfer Protocol):
+
+  - A protocol used for transferring data (web pages, APIs) between client (browser/app) and server.
+  - Runs on port 80 by default.
+  - Data is not encrypted → vulnerable to sniffing and attacks.
+
+- HTTPS (HyperText Transfer Protocol Secure):
+  - Secure version of HTTP, using TLS/SSL encryption.
+  - Runs on port 443 by default.
+  - Ensures confidentiality, integrity, and authentication of data.
+
+Both are the foundation of web communication, but HTTPS is the modern standard because of security.
+
+- **Idempotency**: `GET` is safe (doesn’t change state), `POST` is not.
+- **REST API**: Uses HTTP verbs (`GET, POST, PUT, DELETE`) to manage resources.
+- **CORS**: Security mechanism controlling cross-origin requests.
+- **Cookies / Sessions / JWT**: Used to keep state on top of HTTP.
+- **HTTP/2, HTTP/3**: Faster versions of HTTP with multiplexing and lower latency.
+
+| Feature     | HTTP                    | HTTPS                   |
+| ----------- | ----------------------- | ----------------------- |
+| Port        | 80                      | 443                     |
+| Security    | No encryption           | Encrypted (TLS/SSL)     |
+| Use case    | Old / test environments | Production, secure APIs |
+| Example URL | `http://example.com`    | `https://example.com`   |
+
+# 5.
