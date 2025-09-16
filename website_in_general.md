@@ -4,7 +4,7 @@
 
 # How the web works
 
-<img src="img/part1/download.webp">
+<img src="images/part1/download.webp">
 
 1. The URL gets resolved
 
@@ -29,11 +29,11 @@ Once the IP address is resolved, the browser sends an `HTTP request` to the serv
 
 Requests are transmitted via the `HyperText Transfer Protocol (HTTP)` or its secure variant `HTTPS`, which defines the standardized format for communication between clients and servers.
 
-<img src="img/part1/sendarequestwebp">
+<img src="images/part1/sendarequestwebp">
 
 The server `processes the request` and `returns a response`, which also includes `data and metadata`. For web pages, the response typically contains `HTML code`, though it may also include other resources such as `files`, `images`, or `dynamically generated content` depending on how the server is programmed.
 
-<img src="img/part1/response.webp">
+<img src="images/part1/response.webp">
 
 ## 3. Response is parsed
 
@@ -45,13 +45,13 @@ Once the server sends a response, the browser `parses` it according to the stand
 
 HTML itself is not a programming language but a markup language that uses standardized tags to describe document structure and semantics.
 
-<img src="img/part1/parsedResponse.webp">
+<img src="images/part1/parsedResponse.webp">
 
 ## 4. Page is displayed
 
 The browser processes the parsed HTML to construct the `Document Object Model (DOM)` and display the page. However, HTML only defines structure, not presentation.
 
-<img src="img/part1/displayed1.webp">
+<img src="images/part1/displayed1.webp">
 
 `CSS (Cascading Style Sheets)` provides styling rules, typically loaded via separate .css files. The HTML response may contain <link> tags instructing the browser to fetch these resources, resulting in additional requests.
 
@@ -59,7 +59,7 @@ JavaScript adds interactivity and dynamic behavior by executing code directly in
 
 Thus, modern webpages are rendered through the `combination` of `HTML` (structure), `CSS` (style), and `JavaScript` (behavior), often requiring multiple request–response cycles beyond the initial HTML file.
 
-<img src="img/part1/displayed2.webp">
+<img src="images/part1/displayed2.webp">
 
 ## 5. Server-side vs Client-side
 
@@ -89,11 +89,11 @@ Web development is divided into two primary contexts:
 
 ### HTTP Request - Response (Server and client communication):
 
-<img src="img/part1/ImageOfHTTPRequestResponse-660x374.png">
+<img src="images/part1/ImageOfHTTPRequestResponse-660x374.png">
 
 #### HTTP Request:
 
-<img src="img/part1/08715e70-5e65-480d-bcb1-274e62c7636c.webp">
+<img src="images/part1/08715e70-5e65-480d-bcb1-274e62c7636c.webp">
 
 ##### **Request Line**
 
@@ -136,7 +136,7 @@ Web development is divided into two primary contexts:
 
 #### HTTP Response:
 
-<img src="img/part1/579962dd-5265-426d-8340-ccf52a3fdab8.webp">
+<img src="images/part1/579962dd-5265-426d-8340-ccf52a3fdab8.webp">
 
 ##### **Status Line**
 
