@@ -2,128 +2,173 @@
 
 You have got the big picture of website in <a href="website_in_general.md">website_in_general</a>. Now we deeply dive into concepts.
 
-**Step-by-step flow with layered architecture**
+## **Step-by-step Web Request Flow (Layered Architecture – Extended Version)**
 
-**1. User enters a URL**
+### **1. User Enters a URL**
 
-- The browser receives the domain (e.g., example.com) from the user.
+- **Layer:** Browser Interface
+- The user types a URL (e.g., `https://example.com`) in the address bar.
+- **Browser checks locally first:**
 
-**2. DNS Resolution (Domain → IP)**
-
-- Layer: DNS / Application Layer
-
-- The domain name is translated into an IP address using DNS servers (Recursive → Root → TLD → Authoritative).
-
-- Result: Browser knows which server to contact.
-
-**3. Network Communication (TCP/IP, Ports, Routing)**
-
-- Layer: Networking Layer
-
-- The browser establishes a TCP connection to the server’s IP via port 80 (HTTP) or 443 (HTTPS).
-
-- If HTTPS is used, a TLS handshake encrypts the communication.
-
-**4. HTTP/HTTPS Request (Client → Server)**
-
-- Layer: Application Layer (HTTP)
-
-- The browser sends an HTTP request (GET, POST, etc.) to the web server, containing headers, cookies, and optional body data.
-
-**5. Server Backend Processing**
-
-- Layer: Server / Backend Application
-
-- The web server (e.g., Nginx, Apache) receives the request and forwards it to the backend application (e.g., Node.js, Java, Python).
-
-- The backend executes business logic, interacts with the database, and prepares a response (HTML, JSON, etc.).
-
-**6. Response Delivery**
-
-- Layer: Application + Networking Layers
-
-- The server sends back an HTTP response with status codes, headers, and content (HTML, CSS, JSON, images…).
-
-- This data travels through the same TCP/TLS connection to the browser.
-
-**7. Browser Rendering (Client-side)**
-
-- Layer: Browser Rendering Engine
-
-- The browser parses HTML → builds DOM
-
-- Parses CSS → builds CSSOM
-
-- Executes JavaScript → updates DOM dynamically
-
-- Finally, renders the visual web page to the screen.
-
-**8. Optimization Layer (Performance Enhancements)**
-
-- Layer: Caching & Delivery Layer
-
-- CDNs, proxies, and browser caching store static resources for faster subsequent loads.
-
-- Compression (gzip, Brotli), HTTP/2 multiplexing, and SSL/TLS session reuse further reduce latency and bandwidth.
+  - **Browser cache:** If the resource was recently loaded.
+  - **Service Worker cache:** (if PWA) may intercept the request.
+  - **DNS cache:** Local or OS-level cache for domain resolution.
 
 ---
 
-```pgsql
-You type:  example.com
-           |
-           v
-+------------------+
-|   DNS Lookup     |   🔎 "What is the IP of example.com?"
-+------------------+
-           |
-           v
-+------------------+
-|   TCP/IP Layer   |   📦 Use the IP to establish a connection (TCP handshake)
-+------------------+
-           |
-           v
-+------------------+
-|   HTTP/HTTPS     |   🌐 Send/receive web data over the TCP connection
-+------------------+
-```
+### **2. DNS Resolution (Domain → IP)**
+
+- **Layer:** Application Layer (DNS over UDP/TCP port 53, or DNS over HTTPS/QUIC for security)
+- The browser asks the OS resolver to resolve `example.com` → IP.
+- **Resolution chain:**
+  Recursive Resolver → Root DNS → TLD (.com) → Authoritative DNS → IP Address.
+- **Optimization:**
+
+  - DNS responses are cached (local OS, browser, ISP, or recursive resolver).
+  - Reduces latency for future requests.
+
+- **Result:** Browser gets the IP address of the target server (e.g., `93.184.216.34`).
 
 ---
 
-```pgsql
-[ You / Browser ]
-        |
-        | 1. Type "http://example.com"
-        v
-+-------------------+
-|   DNS Resolver    |  <-- asks "What is example.com?"
-+-------------------+
-        |
-        | 2. DNS Query (UDP/TCP 53)
-        v
-+-------------------+       +---------------------+
-| Root DNS Server   | --->  | .com DNS Server     |
-+-------------------+       +---------------------+
-                                   |
-                                   v
-                           +---------------------+
-                           | example.com DNS     |
-                           | -> 93.184.216.34    |
-                           +---------------------+
+### **3. Network Communication (TCP/IP, Ports, Routing)**
 
-        |
-        | 3. DNS Response: IP = 93.184.216.34
-        v
-[ You / Browser ]
-        |
-        | 4. Open TCP connection (port 80/443)
-        v
-+--------------------------------------------------+
-|   Web Server at 93.184.216.34                    |
-|                                                  |
-|   <--- HTTP Request: GET / HTTP/1.1 ------------ |
-|   ---> HTTP Response: 200 OK + HTML ------------ |
-+--------------------------------------------------+
+- **Layer:** Transport & Internet Layers
+- Browser opens a **TCP connection** to the IP via:
+
+  - Port **80** for HTTP
+  - Port **443** for HTTPS
+
+- **Process:**
+
+  1. **TCP Three-Way Handshake:** SYN → SYN-ACK → ACK.
+  2. If HTTPS: **TLS Handshake** begins — exchanging keys, verifying certificate, establishing encryption.
+  3. For modern web: **HTTP/3** uses **QUIC over UDP** (faster, less handshake overhead).
+
+- **Routing:**
+  IP packets travel through multiple routers, possibly NAT gateways, to reach the server.
+
+---
+
+### **4. HTTP/HTTPS Request (Client → Server)**
+
+- **Layer:** Application Layer
+- The browser constructs an **HTTP request**:
+
+  ```
+  GET /index.html HTTP/1.1
+  Host: example.com
+  User-Agent: Chrome/141.0
+  Accept: text/html
+  Cookie: session_id=xyz
+  ```
+
+- **If HTTPS:** All content is encrypted via TLS.
+- **Special cases:**
+
+  - **CORS:** May trigger a preflight `OPTIONS` request.
+  - **Persistent connections:** Keep-Alive allows multiple requests over one TCP connection.
+
+---
+
+### **5. Server Backend Processing**
+
+- **Layer:** Application & Business Logic Layers
+- **Flow inside the server:**
+
+  1. **Web Server Layer:** Nginx / Apache receives the request.
+
+     - May serve static files directly (HTML, CSS, JS).
+     - Or forward (reverse proxy) to backend app (e.g., Node.js, Spring Boot, Django).
+
+  2. **Backend Application Layer:**
+
+     - Parses the request (routes, controllers).
+     - Executes business logic.
+     - Interacts with:
+
+       - **Database (SQL/NoSQL)** via ORM or raw queries.
+       - **Cache Layer (Redis, Memcached)** for performance.
+       - **External APIs or microservices**.
+
+  3. **Response constructed:**
+
+     - Usually in **JSON, HTML, or binary (images, files)**.
+     - Includes status code, headers, and body.
+
+---
+
+### **6. Response Delivery**
+
+- **Layer:** Application + Networking
+- The backend sends back the **HTTP response**:
+
 ```
+  HTTP/1.1 200 OK
+  Content-Type: text/html; charset=UTF-8
+  Content-Length: 5123
+```
+
+_(Response body follows)_
+
+- **Possible routes before reaching the client:**
+
+  - Reverse proxy → Load balancer → CDN → ISP → Browser.
+
+- **Performance features:**
+
+  - **Compression:** gzip, Brotli.
+  - **Persistent connections:** Reuse TCP/TLS session.
+  - **Multiplexing (HTTP/2, HTTP/3):** Send multiple responses in one connection.
+
+---
+
+### **7. Browser Rendering (Client-side)**
+
+- **Layer:** Browser Rendering Engine (e.g., Blink, WebKit)
+- **Rendering pipeline:**
+
+  1. Parse **HTML** → Build **DOM Tree**.
+  2. Parse **CSS** → Build **CSSOM Tree**.
+  3. Combine → **Render Tree**.
+  4. **Layout**: Calculate positions & sizes.
+  5. **Paint**: Draw pixels.
+  6. **Composite**: GPU-accelerated final render.
+
+- **JavaScript Execution:**
+
+  - Executes via JS Engine (V8, SpiderMonkey).
+  - May modify DOM dynamically (e.g., React, Vue).
+  - Asynchronous operations via event loop.
+
+- **Modern frontends:**
+
+  - **Hydration:** For SSR (Next.js, Nuxt).
+  - **Lazy loading**, **code splitting** improve performance.
+
+---
+
+### **8. Optimization & Delivery Layer**
+
+- **Layer:** Performance Enhancement / Delivery
+- **Caching:**
+
+  - **Browser cache:** Stores static assets.
+  - **CDN (Content Delivery Network):** Edge servers serve content closer to users.
+  - **Reverse proxy caching:** e.g., Nginx, Cloudflare.
+
+- **Compression:** gzip, Brotli.
+- **Connection optimization:** HTTP/2 multiplexing, HTTP/3 over QUIC.
+- **Security:** SSL/TLS session reuse, HSTS, CSP, secure cookies.
+- **Other optimizations:**
+
+  - Minification (HTML/CSS/JS).
+  - Image optimization (WebP, AVIF).
+  - Prefetching / preloading resources.
+
+---
+
+ <img src="images/Screenshot from 2025-10-10 21-16-44.png">
 
 ---
 
