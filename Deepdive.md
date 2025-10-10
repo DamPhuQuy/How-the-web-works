@@ -1,10 +1,7 @@
-# Basic web concepts
-
 # Note for learning basic networking
 
 # Table of contents
 
-- [Basic web concepts](#basic-web-concepts)
 - [Note for learning basic networking](#note-for-learning-basic-networking)
 - [Table of contents](#table-of-contents)
 - [0. Introduction flow:](#0-introduction-flow)
@@ -19,6 +16,7 @@
   - [1.4. DNS records](#14-dns-records)
   - [1.5. Summary:](#15-summary)
 - [2. OSI Model -\> TCP/IP Model (TCP/IP focused)](#2-osi-model---tcpip-model-tcpip-focused)
+  - [2.0. What is the OSI Model?](#20-what-is-the-osi-model)
   - [2.1. Introduction: What is TCP/IP?](#21-introduction-what-is-tcpip)
     - [2.2. Application Layer (OSI: Application + Presentation + Session → TCP/IP: Application)](#22-application-layer-osi-application--presentation--session--tcpip-application)
     - [2.3. Transport Layer (OSI: Transport → TCP/IP: Transport)](#23-transport-layer-osi-transport--tcpip-transport)
@@ -35,21 +33,103 @@
     - [3.5.2. Subnet Mask](#352-subnet-mask)
   - [3.6. Key Formulas and Backend Dev Relevance](#36-key-formulas-and-backend-dev-relevance)
   - [3.7. Summary and example](#37-summary-and-example)
-- [4. HTTP/HTTPS:](#4-httphttps)
-  - [4.1. HTTP (HyperText Transfer Protocol)](#41-http-hypertext-transfer-protocol)
-    - [4.1.1. HTTP Request/Response](#411-http-requestresponse)
-  - [4.2. HTTPS (HTTP Secure)](#42-https-http-secure)
-    - [4.2.1 How HTTPS Works](#421-how-https-works)
+  - [4. HTTP/HTTPS:](#4-httphttps)
+    - [4.1. HTTP (HyperText Transfer Protocol)](#41-http-hypertext-transfer-protocol)
+      - [4.1.1. HTTP Request/Response](#411-http-requestresponse)
+    - [4.2. HTTPS (HTTP Secure)](#42-https-http-secure)
+      - [4.2.1 How HTTPS Works](#421-how-https-works)
     - [4.2.2. **TLS/SSL Basics**](#422-tlsssl-basics)
       - [4.2.2.1. **What TLS/SSL Does**](#4221-what-tlsssl-does)
       - [4.2.2.2. **How TLS/SSL Works (Simplified)**](#4222-how-tlsssl-works-simplified)
       - [4.2.2.3. Why TLS/SSL is Critical for Backend Dev](#4223-why-tlsssl-is-critical-for-backend-dev)
       - [4.2.2.4. Summary](#4224-summary)
-    - [4.2.3. Example (as a backend dev)](#423-example-as-a-backend-dev)
-  - [4.3 Key HTTP/HTTPS Concepts (Summary)](#43-key-httphttps-concepts-summary)
-- [5.](#5)
+      - [4.2.3. Example (as a backend dev)](#423-example-as-a-backend-dev)
+    - [4.3 Key HTTP/HTTPS Concepts (Summary)](#43-key-httphttps-concepts-summary)
+  - [5. Web Server and Backend Logic](#5-web-server-and-backend-logic)
+    - [5.1. Web Server](#51-web-server)
+    - [5.2. Application Server](#52-application-server)
+    - [5.3. Database Layer](#53-database-layer)
+    - [5.4. Backend Workflow](#54-backend-workflow)
+  - [6. Browser Rendering](#6-browser-rendering)
+    - [6.1. Rendering Pipeline (Simplified)](#61-rendering-pipeline-simplified)
+    - [6.2. Frontend Technologies](#62-frontend-technologies)
+    - [6.3. Importance for Backend Developers](#63-importance-for-backend-developers)
+  - [7. Caching, CDN, and Proxy Layers](#7-caching-cdn-and-proxy-layers)
+    - [7.1. Caching](#71-caching)
+    - [7.2. CDN (Content Delivery Network)](#72-cdn-content-delivery-network)
+    - [7.3. Proxy and Load Balancer](#73-proxy-and-load-balancer)
+    - [7.4. Compression \& Optimization](#74-compression--optimization)
+  - [8. End-to-End Summary: From URL to Screen](#8-end-to-end-summary-from-url-to-screen)
 
 # 0. Introduction flow:
+
+You have got the big picture of website in <a href="website_in_general.md">website_in_general</a>. Now we deeply dive into concepts.
+
+**Step-by-step flow with layered architecture**
+
+**1. User enters a URL**
+
+- The browser receives the domain (e.g., example.com) from the user.
+
+**2. DNS Resolution (Domain → IP)**
+
+- Layer: DNS / Application Layer
+
+- The domain name is translated into an IP address using DNS servers (Recursive → Root → TLD → Authoritative).
+
+- Result: Browser knows which server to contact.
+
+**3. Network Communication (TCP/IP, Ports, Routing)**
+
+- Layer: Networking Layer
+
+- The browser establishes a TCP connection to the server’s IP via port 80 (HTTP) or 443 (HTTPS).
+
+- If HTTPS is used, a TLS handshake encrypts the communication.
+
+**4. HTTP/HTTPS Request (Client → Server)**
+
+- Layer: Application Layer (HTTP)
+
+- The browser sends an HTTP request (GET, POST, etc.) to the web server, containing headers, cookies, and optional body data.
+
+**5. Server Backend **Processing\*\*\*\*
+
+- Layer: Server / Backend Application
+
+- The web server (e.g., Nginx, Apache) receives the request and forwards it to the backend application (e.g., Node.js, Java, Python).
+
+- The backend executes business logic, interacts with the database, and prepares a response (HTML, JSON, etc.).
+
+**6. Response Delivery**
+
+- Layer: Application + Networking Layers
+
+- The server sends back an HTTP response with status codes, headers, and content (HTML, CSS, JSON, images…).
+
+- his data travels through the same TCP/TLS connection to the browser.
+
+**7. Browser Rendering (Client-side)**
+
+- Layer: Browser Rendering Engine
+
+- The browser parses HTML → builds DOM
+
+- Parses CSS → builds CSSOM
+
+- Executes JavaScript → updates DOM dynamically
+
+- Finally, renders the visual web page to the screen.
+
+**8. ptimization Layer (Performance Enhancements)**
+
+- Layer: Caching & Delivery Layer
+
+- CDNs, proxies, and browser caching store static resources for faster subsequent loads.
+
+- Compression (gzip, Brotli), HTTP/2 multiplexing, and SSL/TLS session reuse further reduce latency and bandwidth.
+
+---
 
 ```pgsql
 You type:  example.com
@@ -108,11 +188,15 @@ You type:  example.com
 +--------------------------------------------------+
 ```
 
+---
+
 Breakdown:
 
 - DNS: resolves name -> IP.
 - TCP/IP: makes sure two machines can talk reliably using that IP.
 - HTTP/HTTPs: the actual web protocol to exchange requests & responses.
+
+---
 
 # 1. DNS (Domain Name System)
 
@@ -218,6 +302,37 @@ The browser is able to make the request for the web page:
 
 <img src="images/The-logical-mapping-between-OSI-basic-reference-model-and-the-TCP-IP-stack.png">
 
+## 2.0. What is the OSI Model?
+
+The OSI (Open Systems Interconnection) model is a conceptual framework that breaks down the functions of a networking system into seven distinct layers. Its main purpose is to standardize communication and provide a common language for networking, but the modern internet is based on the simpler TCP/IP model.
+
+**The 7 Layers**
+
+- Application: The layer closest to the user; interacts with software like browsers and email clients (HTTP, FTP).
+
+- Presentation: Handles data translation, encryption, and compression to prepare it for the application.
+
+- Session: Manages the communication sessions between two devices, including opening, managing, and closing them.
+
+- Transport: Ensures reliable data delivery, managing flow - control and error correction. Key protocols are TCP and UDP.
+
+- Network: Responsible for addressing and routing data packets across different networks, finding the best path. The main - protocol is IP.
+
+- Data Link: Manages reliable data transmission between two - nodes on the same network (e.g., Ethernet).
+- Physical: Refers to the physical hardware that transmits data, like cables and switches.
+
+**Is it Still Used Today?**
+
+Yes, but mostly as a theoretical and diagnostic tool. The OSI model is not directly implemented in most modern networks.
+
+- Educational Tool: It's excellent for teaching and understanding complex networking concepts in a structured way.
+
+- Troubleshooting: Network professionals use it to isolate problems by identifying which layer is failing.
+
+- Reference Model: It provides a standard framework and vocabulary for developing new networking technologies.
+
+---
+
 ## 2.1. Introduction: What is TCP/IP?
 
 - Protocol Suite: A set of protocols that enable end-to-end communication.
@@ -248,6 +363,8 @@ The browser is able to make the request for the web page:
 - Application + Presentation + Session → Application
 - Data Link + Physical → Network Interface
 
+---
+
 ### 2.2. Application Layer (OSI: Application + Presentation + Session → TCP/IP: Application)
 
 This is the layer you work with the most.
@@ -256,7 +373,7 @@ This is the layer you work with the most.
 - Protocols: HTTP/1.1, HTTP/2, HTTP/3, HTTPS, DNS, SMTP, FTP, gRPC, WebSocket.
 - This is where APIs live.
 - Examples in backend:
-  - When you build a REST API, you’re designing at the Application Layer.
+  - When you build an REST API, you’re designing at the Application Layer.
   - When your backend calls an external API (e.g., GET /users), that’s also Application Layer.
   - TLS encryption (HTTPS) also belongs here.
 
@@ -265,6 +382,8 @@ As a backend dev, when debugging a failing request, you usually check:
 - Headers (Authorization, Content-Type, etc.)
 - Response codes (200, 404, 500…)
 - Certificates (TLS/SSL)
+
+---
 
 ### 2.3. Transport Layer (OSI: Transport → TCP/IP: Transport)
 
@@ -283,6 +402,8 @@ This layer makes sure data arrives correctly.
   - When your API is slow because of many half-open TCP connections → you might hit TIME_WAIT or socket exhaustion.
   - If you deploy a WebSocket or gRPC service, you’re still on TCP.
 
+---
+
 ### 2.4. Network Layer (OSI: Network → TCP/IP: Internet)
 
 This layer decides where the packet goes (routing).
@@ -297,6 +418,8 @@ This layer decides where the packet goes (routing).
   - When your server can’t reach a database in another subnet → likely a routing issue.
   - When DNS resolves correctly but your request still times out → maybe firewall or routing problem.
 
+---
+
 ### 2.5. Link/Physical Layers (OSI: Data Link + Physical → TCP/IP: Network Interface)
 
 This is about hardware and direct connections.
@@ -308,6 +431,8 @@ As a backend developer, you almost never touch this directly, but it matters whe
 
 - Debugging why a server NIC (network card) is misconfigured.
 - Dealing with Docker/Kubernetes networking (bridge, overlay networks).
+
+---
 
 ### 2.6. Summary and example
 
@@ -352,7 +477,7 @@ As a backend developer, you almost never touch this directly, but it matters whe
 
 **EXAMPLE:** TCP Example - REST API / Database
 
-Suppose you build a REST API:
+Suppose you build an REST API:
 
 ```http
 GET /users HTTP/1.1
@@ -384,6 +509,8 @@ Why it matters?
 
 - If DNS resolution fails, your backend can’t even start the HTTP request.
 - This is why misconfigured DNS often causes “server unreachable” errors.
+
+---
 
 # 3. IP Address
 
@@ -521,15 +648,15 @@ Split into 2 subnets (/25):
 - `192.168.1.0/25` → Hosts: 0–127 (126 usable).
 - `192.168.1.128/25` → Hosts: 128–255 (126 usable).
 
-# 4. HTTP/HTTPS:
+## 4. HTTP/HTTPS:
 
-## 4.1. HTTP (HyperText Transfer Protocol)
+### 4.1. HTTP (HyperText Transfer Protocol)
 
 - **Definition**: A communication protocol for transferring data (HTML, JSON, files, etc.) between **client (browser, app)** and **server**.
 - **Stateless**: Each request is independent; server doesn’t “remember” previous requests (unless we use sessions, cookies, or tokens).
 - **Layer**: Works on **Application Layer** (OSI model) and usually runs on **TCP (port 80)**.
 
-### 4.1.1. HTTP Request/Response
+#### 4.1.1. HTTP Request/Response
 
 A request has:
 
@@ -557,7 +684,7 @@ A response has:
 - **Headers** → Metadata (e.g., Content-Length).
 - **Body** → HTML, JSON, or file.
 
-## 4.2. HTTPS (HTTP Secure)
+### 4.2. HTTPS (HTTP Secure)
 
 - **Definition**: HTTP + **TLS/SSL encryption** → Secure communication.
 - **Port**: Runs on **TCP 443**.
@@ -567,7 +694,7 @@ A response has:
   - Authentication (server identity verified by SSL certificate).
   - Integrity (detects tampering).
 
-### 4.2.1 How HTTPS Works
+#### 4.2.1 How HTTPS Works
 
 1. **Handshake**: Client and server exchange keys using TLS.
 2. **Encryption**: Communication is encrypted with symmetric keys.
@@ -635,7 +762,7 @@ When people say “SSL certificate,” they usually mean **TLS certificate**.
 
 - Together, they provide **encryption + authentication + integrity** for HTTPS.
 
-### 4.2.3. Example (as a backend dev)
+#### 4.2.3. Example (as a backend dev)
 
 - You build a REST API:
 
@@ -647,7 +774,7 @@ When people say “SSL certificate,” they usually mean **TLS certificate**.
 
   - **With HTTPS** → All requests & responses are encrypted; attacker sees gibberish.
 
-## 4.3 Key HTTP/HTTPS Concepts (Summary)
+### 4.3 Key HTTP/HTTPS Concepts (Summary)
 
 **Summary**
 
@@ -677,4 +804,90 @@ Both are the foundation of web communication, but HTTPS is the modern standard b
 | Use case    | Old / test environments | Production, secure APIs |
 | Example URL | `http://example.com`    | `https://example.com`   |
 
-# 5.
+## 5. Web Server and Backend Logic
+
+### 5.1. Web Server
+
+A web server (e.g., **Nginx**, **Apache**) receives HTTP requests and routes them to the correct application or static files.
+
+### 5.2. Application Server
+
+Hosts backend logic written in frameworks such as:
+
+- **Node.js / Express**
+- **Java / Spring Boot**
+- **Python / Flask or Django**
+- **C# / ASP.NET**
+
+### 5.3. Database Layer
+
+Stores and retrieves data used by the backend.  
+Common systems: **MySQL, PostgreSQL, MongoDB, Redis.**
+
+### 5.4. Backend Workflow
+
+1. Request arrives at web server.
+2. Server passes it to the application.
+3. Application processes logic and queries the database.
+4. Response is generated and sent back to client.
+
+---
+
+## 6. Browser Rendering
+
+### 6.1. Rendering Pipeline (Simplified)
+
+1. Browser receives HTML, CSS, JS.
+2. Builds **DOM** (Document Object Model).
+3. Builds **CSSOM** (CSS Object Model).
+4. Combines both → **Render Tree**.
+5. Paints pixels on screen.
+
+### 6.2. Frontend Technologies
+
+- **HTML**: Structure
+- **CSS**: Style
+- **JavaScript**: Interactivity
+
+### 6.3. Importance for Backend Developers
+
+Understanding how browsers interpret your backend responses helps optimize API response structure, performance, and caching.
+
+---
+
+## 7. Caching, CDN, and Proxy Layers
+
+### 7.1. Caching
+
+Stores frequently accessed data to improve speed.
+
+- **Browser cache**
+- **Server cache**
+- **Reverse proxy cache (e.g., Nginx, Varnish)**
+
+### 7.2. CDN (Content Delivery Network)
+
+Distributes static assets across global servers to minimize latency for users worldwide.
+
+### 7.3. Proxy and Load Balancer
+
+- **Forward proxy:** Acts on behalf of the client.
+- **Reverse proxy:** Acts on behalf of the server (common in backend).
+- **Load balancer:** Distributes requests among multiple servers.
+
+### 7.4. Compression & Optimization
+
+Techniques like Gzip, Brotli, and image compression reduce bandwidth and speed up load time.
+
+---
+
+## 8. End-to-End Summary: From URL to Screen
+
+1. User enters a URL.
+2. DNS resolves the domain to an IP address.
+3. Browser establishes a TCP/TLS connection.
+4. Sends an HTTP request.
+5. Web server forwards to backend application.
+6. Backend processes and returns an HTTP response.
+7. Browser renders the page.
+8. CDN/proxy/caching optimize future visits.

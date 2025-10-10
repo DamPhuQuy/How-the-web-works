@@ -104,6 +104,8 @@ Web development is divided into two primary contexts:
   2. **Request Target / Path** (`/products/dvd.htm`) → The resource being requested.
   3. **HTTP Version** (`HTTP/1.1`) → Protocol version used.
 
+- **HTTP Methods**: 
+
 ##### **General Headers**
 
 - Apply to both requests and responses, not resource-specific.
