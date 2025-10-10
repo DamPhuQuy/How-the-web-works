@@ -30,7 +30,7 @@ You have got the big picture of website in <a href="website_in_general.md">websi
 
 - The browser sends an HTTP request (GET, POST, etc.) to the web server, containing headers, cookies, and optional body data.
 
-**5. Server Backend **Processing\*\*\*\*
+**5. Server Backend Processing**
 
 - Layer: Server / Backend Application
 
@@ -44,7 +44,7 @@ You have got the big picture of website in <a href="website_in_general.md">websi
 
 - The server sends back an HTTP response with status codes, headers, and content (HTML, CSS, JSON, images…).
 
-- his data travels through the same TCP/TLS connection to the browser.
+- This data travels through the same TCP/TLS connection to the browser.
 
 **7. Browser Rendering (Client-side)**
 
@@ -58,7 +58,7 @@ You have got the big picture of website in <a href="website_in_general.md">websi
 
 - Finally, renders the visual web page to the screen.
 
-**8. ptimization Layer (Performance Enhancements)**
+**8. Optimization Layer (Performance Enhancements)**
 
 - Layer: Caching & Delivery Layer
 
@@ -131,4 +131,4 @@ Breakdown:
 
 - DNS: resolves name -> IP.
 - TCP/IP: makes sure two machines can talk reliably using that IP.
-- HTTP/HTTPs: the actual web protocol to exchange requests & responses.
+- HTTP/HTTPS: the actual web protocol to exchange requests & responses.
