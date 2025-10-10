@@ -36,6 +36,12 @@
   - [4. HTTP/HTTPS:](#4-httphttps)
     - [4.1. HTTP (HyperText Transfer Protocol)](#41-http-hypertext-transfer-protocol)
       - [4.1.1. HTTP Request/Response](#411-http-requestresponse)
+      - [**4.1.2. Common status code**](#412-common-status-code)
+        - [**1xx — Informational**](#1xx--informational)
+        - [**2xx — Success**](#2xx--success)
+        - [**3xx — Redirection**](#3xx--redirection)
+        - [**4xx — Client Error**](#4xx--client-error)
+        - [**5xx — Server Error**](#5xx--server-error)
     - [4.2. HTTPS (HTTP Secure)](#42-https-http-secure)
       - [4.2.1 How HTTPS Works](#421-how-https-works)
     - [4.2.2. **TLS/SSL Basics**](#422-tlsssl-basics)
@@ -683,6 +689,81 @@ A response has:
 
 - **Headers** → Metadata (e.g., Content-Length).
 - **Body** → HTML, JSON, or file.
+
+#### **4.1.2. Common status code**
+
+---
+
+##### **1xx — Informational**
+
+Used to indicate that the request was received and is continuing to be processed.
+
+| Code                        | Meaning          | Description                                                |
+| --------------------------- | ---------------- | ---------------------------------------------------------- |
+| **100 Continue**            | Request received | The client should continue with its request.               |
+| **101 Switching Protocols** | Protocol change  | Server agrees to switch protocols (e.g. HTTP → WebSocket). |
+
+---
+
+##### **2xx — Success**
+
+Means the request was successfully received, understood, and accepted.
+
+| Code               | Meaning                   | Description                                      |
+| ------------------ | ------------------------- | ------------------------------------------------ |
+| **200 OK**         | Success                   | Standard response for successful HTTP requests.  |
+| **201 Created**    | Resource created          | The request created a new resource (e.g., POST). |
+| **202 Accepted**   | Processing                | Request accepted but not yet completed.          |
+| **204 No Content** | Success, no response body | Often used with DELETE requests.                 |
+
+---
+
+##### **3xx — Redirection**
+
+Indicates that further action must be taken to complete the request.
+
+| Code                       | Meaning                                | Description                                    |
+| -------------------------- | -------------------------------------- | ---------------------------------------------- |
+| **301 Moved Permanently**  | Permanent redirect                     | Resource moved to a new URL permanently.       |
+| **302 Found**              | Temporary redirect                     | Resource temporarily available at another URL. |
+| **304 Not Modified**       | Cached response                        | Client can use cached version (no changes).    |
+| **307 Temporary Redirect** | Like 302 but preserves request method. |                                                |
+| **308 Permanent Redirect** | Like 301 but preserves request method. |                                                |
+
+---
+
+##### **4xx — Client Error**
+
+Indicates that the client made an error (invalid request, unauthorized, etc.).
+
+| Code                           | Meaning                      | Description                                                      |
+| ------------------------------ | ---------------------------- | ---------------------------------------------------------------- |
+| **400 Bad Request**            | Invalid syntax               | The server cannot process the request due to bad input.          |
+| **401 Unauthorized**           | Authentication required      | The client must authenticate to get the requested response.      |
+| **403 Forbidden**              | Access denied                | The server understands the request but refuses to authorize it.  |
+| **404 Not Found**              | Resource not found           | The requested resource does not exist.                           |
+| **405 Method Not Allowed**     | Invalid HTTP method          | The method is not supported by the resource.                     |
+| **409 Conflict**               | Conflict with current state  | Typically when updating a resource with conflicting data.        |
+| **410 Gone**                   | Resource permanently deleted | The resource is no longer available.                             |
+| **415 Unsupported Media Type** | Invalid content type         | The server refuses the request because of an unsupported format. |
+| **429 Too Many Requests**      | Rate limiting                | The user has sent too many requests in a given time.             |
+
+---
+
+##### **5xx — Server Error**
+
+The request was valid, but the server failed to fulfill it.
+
+| Code                               | Meaning                        | Description                                                  |
+| ---------------------------------- | ------------------------------ | ------------------------------------------------------------ |
+| **500 Internal Server Error**      | Generic server error           | The server encountered an unexpected condition.              |
+| **501 Not Implemented**            | Unsupported functionality      | The server doesn’t support the requested method.             |
+| **502 Bad Gateway**                | Invalid response from upstream | The server received an invalid response from another server. |
+| **503 Service Unavailable**        | Temporarily overloaded         | The server is down or overloaded.                            |
+| **504 Gateway Timeout**            | Timeout from upstream          | The upstream server failed to send a response in time.       |
+| **505 HTTP Version Not Supported** | Unsupported HTTP version       | The server doesn’t support the HTTP protocol version used.   |
+
+---
 
 ### 4.2. HTTPS (HTTP Secure)
 
